@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Sui Ping Suen" />
+
+
+<title>NYPD Stop, Question, and Frisk 2015</title>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("section-TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+
+<div class="fluid-row" id="section-header">
+
+
+
+<h1 class="title toc-ignore">NYPD Stop, Question, and Frisk 2015</h1>
+<h4 class="author"><em>Sui Ping Suen</em></h4>
+<h4 class="date"><em>2017/8/12</em></h4>
+
+</div>
+
+
+<div id="section-i.problem-statement" class="section level2">
+<h2>I.Problem Statement</h2>
+<p>According to <a href="http://www1.nyc.gov/site/nypd/stats/reports-analysis/stopfrisk.page">New York City Police Department(NYPD)? stats data</a>, in 2015, there are 22563 street stops conducted by NYPD recorded. Among these stops, only 3958 arrests are made, which means that only 17.59% of these street stops are successful, and the rest of the stops involve with innocent people. Therefore, for this toolbox project, I want find the relationship between different characteristics of suspects and corresponding actions of officers. By finding out those most influential factors which lead to successful arrests, we can improve the stop-and-frisk efficiency rate of NYPD.</p>
+</div>
+<div id="section-ii.data-exploration" class="section level2">
+<h2>II.Data Exploration</h2>
+<p>The dataset I am going to use is Stop, Question, and Frisk database of 2015, which is provided by NYPD? official website. It collects and records street stops conducted by the NYPD in 2015, which contains 22563 rows and 112 variables.</p>
+<pre class="r"><code>str(SQF)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    22563 obs. of  112 variables:
+##  $ year    : int  2015 2015 2015 2015 2015 2015 2015 2015 2015 2015 ...
+##  $ pct     : int  61 22 20 20 20 20 67 7 7 68 ...
+##  $ ser_num : int  18 5 36 38 41 39 122 37 42 9 ...
+##  $ datestop: int  1012015 1152015 1292015 1292015 1292015 1292015 2062015 2072015 2122015 2142015 ...
+##  $ timestop: int  315 1747 1745 1745 1745 1745 2155 2115 1405 200 ...
+##  $ recstat : Factor w/ 4 levels &quot; &quot;,&quot;1&quot;,&quot;9&quot;,&quot;A&quot;: 2 4 2 2 2 2 2 2 2 4 ...
+##  $ inout   : Factor w/ 2 levels &quot;I&quot;,&quot;O&quot;: 2 2 2 2 2 2 2 1 1 2 ...
+##  $ trhsloc : Factor w/ 3 levels &quot;H&quot;,&quot;P&quot;,&quot;T&quot;: 2 2 2 2 2 2 2 1 3 2 ...
+##  $ perobs  : num  2 1 1 1 1 1 2 1 9 1 ...
+##  $ crimsusp: Factor w/ 907 levels &quot; CPW&quot;,&quot; CRIMINAL TRESPASS&quot;,..: 466 466 659 634 659 659 404 404 404 498 ...
+##  $ perstop : Factor w/ 63 levels &quot; &quot;,&quot;**&quot;,&quot;1&quot;,&quot;10&quot;,..: 4 36 10 10 10 10 46 46 25 4 ...
+##  $ typeofid: Factor w/ 4 levels &quot;O&quot;,&quot;P&quot;,&quot;R&quot;,&quot;V&quot;: 4 4 4 4 4 4 3 4 2 4 ...
+##  $ explnstp: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 2 2 2 2 2 2 2 2 2 2 ...
+##  $ othpers : Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 2 2 2 1 1 1 2 ...
+##  $ arstmade: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ arstoffn: Factor w/ 627 levels &quot; &quot;,&quot; 140.35&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ sumissue: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ sumoffen: Factor w/ 232 levels &quot; &quot;,&quot; VTL 1180 A&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ compyear: int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ comppct : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ offunif : Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 2 ...
+##  $ officrid: Factor w/ 2 levels &quot; &quot;,&quot;I&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ frisked : Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 2 2 1 1 1 1 2 2 2 1 ...
+##  $ searched: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ contrabn: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ adtlrept: Factor w/ 1 level &quot;N&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ pistol  : Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ riflshot: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ asltweap: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ knifcuti: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ machgun : Factor w/ 1 level &quot;N&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ othrweap: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ pf_hands: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 2 2 1 2 2 1 1 1 1 ...
+##  $ pf_wall : Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ pf_grnd : Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ pf_drwep: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ pf_ptwep: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ pf_baton: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ pf_hcuff: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 2 1 ...
+##  $ pf_pepsp: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ pf_other: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ radio   : Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 2 2 2 2 2 1 1 1 2 ...
+##  $ ac_rept : Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 2 2 2 2 2 2 1 1 1 2 ...
+##  $ ac_inves: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 2 1 1 ...
+##  $ rf_vcrim: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 2 1 1 1 1 1 2 1 1 ...
+##  $ rf_othsw: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 2 1 1 1 1 1 1 1 1 ...
+##  $ ac_proxm: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 2 2 1 1 1 1 1 2 1 1 ...
+##  $ rf_attir: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ cs_objcs: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ cs_descr: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 2 2 1 1 1 1 1 2 1 2 ...
+##  $ cs_casng: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 2 1 1 1 1 1 1 2 2 1 ...
+##  $ cs_lkout: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 2 2 1 ...
+##  $ rf_vcact: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ cs_cloth: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ cs_drgtr: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ ac_evasv: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 2 1 2 2 2 1 1 1 1 ...
+##  $ ac_assoc: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 2 1 1 ...
+##  $ cs_furtv: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 2 2 2 2 2 2 1 1 1 ...
+##  $ rf_rfcmp: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 2 1 1 1 1 1 1 1 2 1 ...
+##  $ ac_cgdir: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ rf_verbl: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ cs_vcrim: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ cs_bulge: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ cs_other: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 2 2 2 2 2 1 1 1 2 ...
+##  $ ac_incid: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 2 1 1 1 1 1 2 2 2 1 ...
+##  $ ac_time : Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 2 1 1 1 1 1 2 2 1 1 ...
+##  $ rf_knowl: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 2 1 1 ...
+##  $ ac_stsnd: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ ac_other: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 2 1 1 1 1 ...
+##  $ sb_hdobj: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ sb_outln: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ sb_admis: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ sb_other: Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ repcmd  : int  186 483 483 483 483 483 186 804 863 68 ...
+##  $ revcmd  : int  186 483 483 483 483 483 186 804 863 68 ...
+##  $ rf_furt : Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 2 2 2 1 ...
+##  $ rf_bulg : Factor w/ 2 levels &quot;N&quot;,&quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ offverb : Factor w/ 2 levels &quot; &quot;,&quot;V&quot;: 2 2 2 2 2 2 2 2 2 1 ...
+##  $ offshld : Factor w/ 2 levels &quot; &quot;,&quot;S&quot;: 2 2 2 2 2 2 2 2 2 1 ...
+##  $ forceuse: Factor w/ 7 levels &quot; &quot;,&quot;DO&quot;,&quot;DS&quot;,..: 1 6 6 1 6 6 1 1 4 1 ...
+##  $ sex     : Factor w/ 3 levels &quot;F&quot;,&quot;M&quot;,&quot;Z&quot;: 2 2 2 2 2 2 2 2 2 2 ...
+##  $ race    : Factor w/ 8 levels &quot;A&quot;,&quot;B&quot;,&quot;I&quot;,&quot;P&quot;,..: 7 2 2 2 2 7 2 2 2 7 ...
+##  $ dob     : logi  NA NA NA NA NA NA ...
+##  $ age     : int  33 14 14 14 13 13 25 15 23 16 ...
+##  $ ht_feet : int  5 5 5 5 5 5 5 5 5 5 ...
+##  $ ht_inch : int  11 8 3 9 10 2 9 7 9 10 ...
+##  $ weight  : int  190 140 140 180 160 130 160 150 160 150 ...
+##  $ haircolr: Factor w/ 11 levels &quot;BA&quot;,&quot;BK&quot;,&quot;BL&quot;,..: 4 2 2 2 2 2 2 4 2 4 ...
+##  $ eyecolor: Factor w/ 10 levels &quot;BK&quot;,&quot;BL&quot;,&quot;BR&quot;,..: 3 3 3 3 3 3 3 3 3 5 ...
+##  $ build   : Factor w/ 5 levels &quot;H&quot;,&quot;M&quot;,&quot;T&quot;,&quot;U&quot;,..: 2 3 3 2 2 2 3 3 3 2 ...
+##  $ othfeatr: Factor w/ 198 levels &quot; &quot;,&quot;\&quot;BROOKLYN\&quot; ON ARM&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ addrtyp : Factor w/ 1 level &quot;L&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ rescode : logi  NA NA NA NA NA NA ...
+##  $ premtype: logi  NA NA NA NA NA NA ...
+##  $ premname: Factor w/ 1736 levels &quot; &quot;,&quot;\&quot;L\&quot; ISLAND PLATFORM&quot;,..: 1525 24 1525 1525 1525 1525 1 819 856 1525 ...
+##  $ addrnum : Factor w/ 2524 levels &quot; &quot;,&quot;  0&quot;,&quot;  1&quot;,..: 1 1 1809 1809 1809 1809 1 1872 1 557 ...
+##  $ stname  : Factor w/ 1749 levels &quot; &quot;,&quot;1 AVENUE&quot;,..: 1 1 576 576 576 576 1 1353 1 311 ...
+##  $ stinter : Factor w/ 2738 levels &quot; &quot;,&quot;1 AVENUE&quot;,..: 549 2359 2635 2635 2635 2635 1232 2117 1290 2104 ...
+##  $ crossst : Factor w/ 2765 levels &quot; &quot;,&quot;1 AVENUE&quot;,..: 1243 2683 2661 2661 2661 2661 926 1038 1038 1823 ...
+##   [list output truncated]</code></pre>
+</div>
+<div id="section-iii.data-processing" class="section level2">
+<h2>III.Data Processing</h2>
+<p>First, I exclude the variables I am not going to use:</p>
+<pre class="r"><code>library(tidyr)</code></pre>
+<pre><code>## Warning: package &#39;tidyr&#39; was built under R version 3.3.3</code></pre>
+<pre class="r"><code>library(dplyr)</code></pre>
+<pre><code>## Warning: package &#39;dplyr&#39; was built under R version 3.3.3</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>sqf1&lt;-SQF[ -c(1:3,6,10,13,16,18:20,22,25:80,83,91:100,102:111)]</code></pre>
+<p>Second, I rename the variables to make them more understandable:</p>
+<pre class="r"><code>sqf2&lt;-rename(sqf1,outinside=inout, 
+            housingtransit=trhsloc, 
+            periodobserve=perobs,
+            periodstop=perstop,
+            otherperson=othpers,
+            officeruniform=offunif)</code></pre>
+<p>Third, I delete the records with missing values, typos, or outliers for each variable:<br />
+<strong>timestop</strong>:represents time of stop in HH:MM format. Some of the values show as “10”,“15”,“50”, which do not make sense, and I assume they are typos. Therefore, I delete these values.<br />
+<strong>periodobserve</strong>:represents period of observation in minutes. Some values are extremely high, so I delete those outliers.<br />
+<strong>periodstop</strong>:represents period of stop in minutes.I turn the varibale from factor into numbers first, and then delete those missing values=and outliers.<br />
+<strong>age</strong>:age of suspects.Some values are extremely high, such as 230 or 338 years old. Therefore, I only keep ages under 110.<br />
+<strong>weight</strong>:weight of suspects.Some values are really small, so I exclude those weights lighter than 10.<br />
+<strong>housingtransit</strong>:indicates if the location is housing or transit authority. Here “P” means neither. Therefore, I assign it as NA. <strong>sex,race,haircolr,eyecolor,build</strong>:assign NA to unknown values.</p>
+<pre class="r"><code>sqf2$periodstop&lt;-as.numeric(sqf2$periodstop)
+sqf3&lt;-sqf2%&gt;%filter(timestop&gt;=100)%&gt;%
+              filter(periodobserve&lt;=120)%&gt;%
+              filter(periodstop&lt;=90)%&gt;%
+              filter(age&gt;0 &amp; age&lt;=110)%&gt;%
+              filter(weight&gt;10 &amp; weight&lt;=400)</code></pre>
+<pre><code>## Warning: package &#39;bindrcpp&#39; was built under R version 3.3.3</code></pre>
+<pre class="r"><code>sqf3$housingtransit[sqf3$housingtransit==&quot;P&quot;]&lt;-NA
+sqf3$sex[sqf3$sex==&quot;Z&quot;]&lt;-NA
+sqf3$race[sqf3$race==&quot;Z&quot;|sqf3$race==&quot;U&quot;|sqf3$race==&quot;X&quot;]&lt;-NA
+sqf3$haircolr[sqf3$haircolr==&quot;XX&quot;|sqf3$haircolr==&quot;ZZ&quot;]&lt;-NA
+sqf3$eyecolor[sqf3$eyecolor==&quot;XX&quot;|sqf3$eyecolor==&quot;XX&quot;]&lt;-NA
+sqf3$build[sqf3$build==&quot;Z&quot;]&lt;-NA</code></pre>
+<p>Fourth, I reformat some of varibles by either seperating or combining them:<br />
+<strong>datestop</strong>: I divide the date of stop which show month and weekday separately.<br />
+<strong>timestop</strong>: I divide the time of stop which shows hour separately.<br />
+<strong>ht_feet</strong> &amp; <strong>ht_inch</strong>: I combine the column of height in feet and inch to see the suspects’ height.</p>
+<pre class="r"><code>library(stringr)
+sqf3$datestop &lt;- as.Date(sprintf(&quot;%08d&quot;, sqf3$datestop), format =&quot;%m%d%Y&quot;)
+sqf3$timestop &lt;- as.integer(substr(sprintf(&quot;%04d&quot;, sqf3$timestop), 1, 2))
+
+sqf3&lt;-mutate(sqf3,
+             monthstop=format(sqf3$datestop, &#39;%m&#39;),
+             daystop=format(sqf3$datestop, &#39;%A&#39;),
+             height=as.numeric(str_replace_all(paste(sqf3$ht_feet,&quot;.&quot;,sqf3$ht_inch), pattern=&quot; &quot;, repl=&quot;&quot;)))
+sqf4&lt;-subset(sqf3,select=-c(datestop,ht_feet,ht_inch))</code></pre>
+<p>After processing data, the dataset looks like following:</p>
+<pre class="r"><code>dim(sqf4)</code></pre>
+<pre><code>## [1] 20745    24</code></pre>
+<pre class="r"><code>summary(sqf4)</code></pre>
+<pre><code>##     timestop    outinside housingtransit periodobserve       periodstop   
+##  Min.   : 1.0   I: 3969   H   : 3099     Min.   :  0.000   Min.   : 1.00  
+##  1st Qu.:10.0   O:16776   P   :    0     1st Qu.:  1.000   1st Qu.: 4.00  
+##  Median :17.0             T   :  865     Median :  1.000   Median :25.00  
+##  Mean   :14.6             NA&#39;s:16781     Mean   :  2.557   Mean   :27.07  
+##  3rd Qu.:21.0                            3rd Qu.:  2.000   3rd Qu.:46.00  
+##  Max.   :23.0                            Max.   :106.000   Max.   :63.00  
+##                                                                           
+##  typeofid  otherperson arstmade  sumissue  officeruniform frisked  
+##  O:  399   N:14576     N:17044   N:20203   N: 9066        N: 6797  
+##  P:11942   Y: 6169     Y: 3701   Y:  542   Y:11679        Y:13948  
+##  R:  579                                                           
+##  V: 7825                                                           
+##                                                                    
+##                                                                    
+##                                                                    
+##  searched    sex             race            age             weight     
+##  N:16848   F   : 1405   B      :10939   Min.   :  1.00   Min.   : 11.0  
+##  Y: 3897   M   :19169   Q      : 4718   1st Qu.: 19.00   1st Qu.:150.0  
+##            Z   :    0   W      : 2295   Median : 24.00   Median :170.0  
+##            NA&#39;s:  171   P      : 1321   Mean   : 27.68   Mean   :170.4  
+##                         A      : 1027   3rd Qu.: 33.00   3rd Qu.:185.0  
+##                         (Other):   71   Max.   :110.00   Max.   :400.0  
+##                         NA&#39;s   :  374                                   
+##     haircolr        eyecolor      build              city     
+##  BK     :14867   BR     :18402   H   : 2009   BRONX    :4365  
+##  BR     : 4411   BK     : 1353   M   :10122   BROOKLYN :5830  
+##  BA     :  501   BL     :  390   T   : 8151   MANHATTAN:3655  
+##  BL     :  295   HA     :  199   U   :  174   QUEENS   :5271  
+##  GY     :  179   GR     :  153   Z   :    0   STATEN IS:1624  
+##  (Other):  193   (Other):  113   NA&#39;s:  289                   
+##  NA&#39;s   :  299   NA&#39;s   :  135                                
+##     detailCM       monthstop           daystop              height     
+##  Min.   :  6.00   Length:20745       Length:20745       Min.   :3.110  
+##  1st Qu.: 20.00   Class :character   Class :character   1st Qu.:5.400  
+##  Median : 27.00   Mode  :character   Mode  :character   Median :5.700  
+##  Mean   : 37.99                                         Mean   :5.648  
+##  3rd Qu.: 46.00                                         3rd Qu.:5.900  
+##  Max.   :113.00                                         Max.   :7.300  
+## </code></pre>
+</div>
+<div id="section-iv.data-visulization-analytics" class="section level2">
+<h2>IV.Data Visulization &amp; Analytics</h2>
+<p>First, we take a look of some general information about suspects who are stopped by NYPD.<br />
+<strong>Figure 1</strong>: suspects’ age<br />
+From the graph we can see that most of suspects are <strong>around 20 years old</strong>.</p>
+<pre><code>## Warning: package &#39;ggplot2&#39; was built under R version 3.3.3</code></pre>
+<p><img src="file5a24290a353d_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p><strong>Figure 2</strong>:race and gender of the suspects<br />
+From the graph we can see that <strong>most</strong> of the suspects are <strong>black male</strong>. <strong>Few</strong> suspects are <strong>Asian and American Indian females</strong>.</p>
+<p><img src="file5a24290a353d_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>Second, we take a look of the information about the stops.<br />
+<strong>Figure 3</strong>: weekdays of stops<br />
+From the graph we can see that there are realtively <strong>less stops happened on Monday</strong>.</p>
+<p><img src="file5a24290a353d_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><strong>Figure 4</strong>:month of stops<br />
+From the graph we can see that there are <strong>more stops</strong> happened in the <strong>first half year</strong> of 2015.</p>
+<p><img src="file5a24290a353d_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p><strong>Figure 5</strong>:time and location of stops From the graph we can see that there are <strong>more stops</strong> happened at <strong>night</strong>. <strong>Bronx</strong> area has a <strong>higher variance</strong>.</p>
+<p><img src="file5a24290a353d_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>Third, to find out which stops are effective, and what kind of characteristics will lead the arrest to be excuted or summons to be issued. We try to figure out the relationship between the variable “arstmade”, which shows if an arrest was made,“sumissue”, which shows if summons was issued, and all the other variables.</p>
+<p><strong>Figure 6</strong>:the number of arrests made or summon issued among all the stops</p>
+<p><img src="file5a24290a353d_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p><strong>Figure 8</strong>:if police arrest or issue summons,based on ages From the graph, we can see that people around <strong>20 years old</strong> have higher probability to receieve <strong>summons</strong> after being stopped, but people around <strong>30 years old</strong> have higher probability to be <strong>arrested</strong> after being stopped.</p>
+<p><img src="file5a24290a353d_files/figure-html/unnamed-chunk-15-1.png" width="672" /><img src="file5a24290a353d_files/figure-html/unnamed-chunk-15-2.png" width="672" /></p>
+<p><strong>Figure 9</strong>:if suspects are arrested by police, group by hours From the graph, we can see that most of the arrest happened from <strong>19::00 to 22:00</strong>.</p>
+<p><img src="file5a24290a353d_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+</div>
+<div id="section-v.conclusions" class="section level2">
+<h2>V.Conclusions</h2>
+<p>1.Police in <strong>Bronx</strong> have higher accuracy in stopping people<br />
+2.NYPD should focus more on people around <strong>30 years old</strong><br />
+3.NYPD need to deploy more armed force from <strong>19:00 to 22:00</strong></p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
